@@ -1,0 +1,38 @@
+services:
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: transactions
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/transactions
+      REDIS_URL: redis://redis:6379/0
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: .
+    command: celery -A app.worker.tasks worker --pool=solo --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/transactions
+      REDIS_URL: redis://redis:6379/0
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    depends_on:
+      - db
+      - redis

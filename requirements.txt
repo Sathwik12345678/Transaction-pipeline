@@ -3,14 +3,9 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 alembic
-
 celery
 redis
-
 pandas
-
 python-multipart
-
-google-generativeai
-
+groq 
 python-dotenv
